@@ -15,6 +15,7 @@ import logging
 from time import sleep
 from operator import itemgetter
 import os
+import shlex
 
 oauth_link = "https://oauth.vk.com/authorize?client_id=4967910&redirect_uri=https://oauth.vk.com/blank.html&scope={scope}&display=mobile&response_type=token".format(scope='messages ')
 
@@ -75,16 +76,13 @@ class Notifier:
 				f.write(chunk)
 		return icon_loc, data[0]['first_name'], data[0]['last_name']
 
-	def _sanitized(self, text):
-		return text.replace("'", "\"").replace("\\", "\\\\")
-
 	def send_notify(self, uid, title, body):
 		icon,name,surname = self._get_icon(uid)
 		summary = title + ", "  + name + ' ' + surname
-		# May be danherous to call os.system
-		summary = self._sanitized(summary)
-		body = self._sanitized(body)
-		os.system("notify-send -i $(pwd)/{icon} '{summary}' '{body}'".format(
+		summary = shlex.quote(summary)
+		body = shlex.quote(body)
+		print(summary, body)
+		os.system("notify-send -i $(pwd)/{icon} {summary} {body}".format(
 			icon = icon, summary = summary, body = body))
 
 	def run(self):
