@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 #
 # config.json structure:
@@ -48,6 +49,7 @@ class VK:
 		return requests.get(req_url, params=params)
 
 class Notifier:
+	ICON_LOCATION = '/tmp/icon.png'
 	def __init__(self,uid):
 		self.vk = VK(uid)
 
@@ -70,7 +72,7 @@ class Notifier:
 		icon_url = data[0]['photo_50']
 		resp = requests.get(icon_url, stream=True)
 		resp.raise_for_status()
-		icon_loc = 'icon.png'
+		icon_loc = self.ICON_LOCATION
 		with open(icon_loc, 'wb') as f:
 			for chunk in resp:
 				f.write(chunk)
@@ -84,7 +86,7 @@ class Notifier:
 		summary = title + ", "  + name + ' ' + surname
 		summary = shlex.quote(summary)
 		body = shlex.quote(self._sanitize(body))
-		os.system("notify-send -i $(pwd)/{icon} {summary} {body}".format(
+		os.system("notify-send -i {icon} {summary} {body}".format(
 			icon = icon, summary = summary, body = body))
 
 	def run(self):
