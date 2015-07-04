@@ -76,12 +76,14 @@ class Notifier:
 				f.write(chunk)
 		return icon_loc, data[0]['first_name'], data[0]['last_name']
 
+	def _sanitize(self, text):
+		return text.replace("\\", '\\\\').replace("<br>", '\n')
+
 	def send_notify(self, uid, title, body):
 		icon,name,surname = self._get_icon(uid)
 		summary = title + ", "  + name + ' ' + surname
 		summary = shlex.quote(summary)
-		body = shlex.quote(body)
-		print(summary, body)
+		body = shlex.quote(self._sanitize(body))
 		os.system("notify-send -i $(pwd)/{icon} {summary} {body}".format(
 			icon = icon, summary = summary, body = body))
 
